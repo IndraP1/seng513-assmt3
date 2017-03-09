@@ -25,7 +25,6 @@ app.get('/', function(req, res, next) {
         usercolor = "blue";
         res.cookie("usercolor", usercolor);
     }
-    console.log(users);
     next();
 });
 
@@ -38,13 +37,11 @@ io.on('connection', function(socket){
         var firstWord = msg.message.split(' ')[0];
 
         if (firstWord === "/nick") {
+            console.log(users);
             var secondWord = msg.message.split(' ')[1];
-            if (users.indexOf(msg.secondWord) > -1) {
-                console.log("username exists")
-            } else {
-                var index = users.indexOf(msg.name);
-                users.splice(index, 1);
-                users.push(secondWord); 
+            var index = users.indexOf(secondWord)
+            if (index === -1) {
+                users[users.indexOf(msg.name)] = secondWord;
                 socket.emit('change_username_cookie', secondWord);
             }
             console.log(users);
@@ -54,8 +51,10 @@ io.on('connection', function(socket){
             console.log(secondWord);
             socket.emit('change_usercolor_cookie', secondWord);
         }
-        console.log("msg" + msg.color);
-        io.emit('chat', {message: msg.message, date: current_date, name: msg.name, color: msg.color});
+        // send to self
+        socket.emit('chat', {message: msg.message, date: current_date, name: msg.name, color: msg.color, style: "bold"});
+        // send to all clients except sender
+        socket.broadcast.emit('chat', {message: msg.message, date: current_date, name: msg.name, color: msg.color});
     });
 
     socket.on('disconnect', function(){

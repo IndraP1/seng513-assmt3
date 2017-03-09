@@ -36,9 +36,15 @@ $(function() {
             + current_date.getMinutes() + " ";
         var usercolor = msg.color;
 
-        $('#messages').append('<li><b>' + current_time + 
-                '</b> <username class="userColor" style="color:'+usercolor+';">' +
-                username + '</username>: '+ msg.message);
+        if (msg.style === "bold") {
+            $('#messages').append('<li><b>' + current_time + 
+                    '</b> <username class="userColor" style="color:'+usercolor+';">' +
+                    username + '</username>: <b>'+ msg.message + '</b>');
+        } else {
+            $('#messages').append('<li><b>' + current_time + 
+                    '</b> <username class="userColor" style="color:'+usercolor+';">' +
+                    username + '</username>: '+ msg.message);
+        }
     });
 });
 
