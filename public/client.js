@@ -1,36 +1,44 @@
 // shorthand for $(document).ready(...)
 $(function() {
     var socket = io();
+    var users = [];
 
-    $('form').submit(function(){
-        socket.emit('chat', $('#m').val());
+    $('form').submit(function() {
+        socket.emit('chat', {message: $('#m').val(), name: getCookie("username"), color: getCookie("usercolor")});
         $('#m').val('');
         return false;
     });
 
-    socket.on('chat', function(msg){
-        var current_date = new Date(); 
+    var username = getCookie("username");
+    if ($.inArray(username, users) === -1) {
+        users.push(username); 
+    }
+
+    socket.on('change_username_cookie', function(msg) {
+        setCookie("username", msg);
+    });
+
+    socket.on('change_usercolor_cookie', function(msg) {
+        setCookie("usercolor", msg);
+    });
+
+    socket.on('chat', function(msg) {
+        current_date = new Date(msg.date)
 
         // if /nick tag or /color tag perform other operations else:
-        // var firstWord = msg.substr(0, msg.indexOf(" "));
-        var firstWord = msg.split(' ')[0];
+        // else if (firstWord === "/nickcolor") {
+        //     var secondWord = msg.message.split(' ')[1];
+        //     setCookie("usercolor", secondWord);
+        // }
 
-        if (firstWord === "/nick") {
-            var secondWord = msg.split(' ')[1];
-            setCookie("username", secondWord);
-        } else if (firstWord === "/nickcolor") {
-            var secondWord = msg.split(' ')[1];
-            setCookie("usercolor", secondWord);
-        }
-
+        var username = msg.name;
         var current_time = current_date.getHours() + ":"
             + current_date.getMinutes() + " ";
-        var username = getCookie("username");
-        var usercolor = getCookie("usercolor");
+        var usercolor = msg.color;
 
         $('#messages').append('<li><b>' + current_time + 
                 '</b> <username class="userColor" style="color:'+usercolor+';">' +
-                username + '</username>: '+ msg);
+                username + '</username>: '+ msg.message);
     });
 });
 
@@ -43,9 +51,6 @@ function getFirstWord(str) {
 
 // Code taken from https://www.w3schools.com/js/js_cookies.asp
 function setCookie(cname, cvalue, exdays) {
-    // var d = new Date();
-   // d.setTime(d.getTime() + (exdays*24*60*60*1000));
-    // var expires = "expires="+ d.toUTCString();
     document.cookie = cname + "=" + cvalue + ";path=/";
 }
 
