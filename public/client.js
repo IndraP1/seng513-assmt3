@@ -2,6 +2,7 @@
 $(function() {
     var socket = io();
     var users = [];
+    var username;
 
     $('form').submit(function() {
         socket.emit('chat', {message: $('#m').val(), name: getCookie("username"), color: getCookie("usercolor")});
@@ -22,16 +23,15 @@ $(function() {
         setCookie("usercolor", msg);
     });
 
+    socket.on('change_userlist', function(users) {
+        console.log("here");
+        console.log(users);
+    });
+
     socket.on('chat', function(msg) {
         current_date = new Date(msg.date)
 
-        // if /nick tag or /color tag perform other operations else:
-        // else if (firstWord === "/nickcolor") {
-        //     var secondWord = msg.message.split(' ')[1];
-        //     setCookie("usercolor", secondWord);
-        // }
-
-        var username = msg.name;
+        username = msg.name;
         var current_time = current_date.getHours() + ":"
             + current_date.getMinutes() + " ";
         var usercolor = msg.color;
@@ -45,6 +45,10 @@ $(function() {
                     '</b> <username class="userColor" style="color:'+usercolor+';">' +
                     username + '</username>: '+ msg.message);
         }
+    });
+
+    socket.on('disconnect', function() {
+        socket.emit('disconnected', username);
     });
 });
 

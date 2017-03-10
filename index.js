@@ -8,6 +8,7 @@ var cookie = require('cookies');
 var cookieParser = require('cookie-parser');
 
 var users = [];
+
 app.use(cookieParser());
 
 http.listen( port, function () {
@@ -19,12 +20,14 @@ app.get('/', function(req, res, next) {
         username = "user" + Math.random();
         res.cookie("username", username);
         users.push(username); 
+        console.log(users);
     }
 
     if (req.cookies.usercolor === undefined) {
         usercolor = "blue";
         res.cookie("usercolor", usercolor);
     }
+    io.emit('change_userlist', users);
     next();
 });
 
@@ -37,18 +40,16 @@ io.on('connection', function(socket){
         var firstWord = msg.message.split(' ')[0];
 
         if (firstWord === "/nick") {
-            console.log(users);
             var secondWord = msg.message.split(' ')[1];
             var index = users.indexOf(secondWord)
             if (index === -1) {
                 users[users.indexOf(msg.name)] = secondWord;
                 socket.emit('change_username_cookie', secondWord);
+                io.emit('change_userlist', users);
             }
-            console.log(users);
         }
         if (firstWord === "/nickcolor") {
             var secondWord = msg.message.split(' ')[1];
-            console.log(secondWord);
             socket.emit('change_usercolor_cookie', secondWord);
         }
         // send to self
@@ -57,8 +58,8 @@ io.on('connection', function(socket){
         socket.broadcast.emit('chat', {message: msg.message, date: current_date, name: msg.name, color: msg.color});
     });
 
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
+    socket.on('disconnected', function(username){
+        console.log('user disconnected' + username);
     });
 });
 
