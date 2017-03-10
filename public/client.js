@@ -4,7 +4,6 @@ $(function() {
     var users = [];
     var username;
     $('div.username-display').html('You are user: ' + getCookie("username"));
-    // $("username-display").update("You are user: " + getCookie("username"));
 
     $('form').submit(function() {
         socket.emit('chat', {message: $('#m').val(), name: getCookie("username"), color: getCookie("usercolor")});
@@ -27,7 +26,8 @@ $(function() {
     });
 
     socket.on('change_userlist', function(users) {
-        console.log("here");
+        console.log("change userlist");
+        $('#user-display').append('<li>'+users);
         console.log(users);
     });
 
