@@ -9,6 +9,7 @@ var cookieParser = require('cookie-parser');
 
 var users = new Map();
 var userlist = [];
+var messages = [];
 
 app.use(cookieParser());
 
@@ -23,6 +24,12 @@ io.on('connection', function(socket){
         users.set(socket, {username: username, usercolor: usercolor}); 
         userlist.push(username);
         io.emit('change_userlist', userlist);
+    });
+
+    socket.on('store-message', function(message){
+        messages.push(message);
+        console.log("test");
+        console.log(messages);
     });
 
     socket.on('chat', function(msg){
@@ -58,13 +65,11 @@ io.on('connection', function(socket){
     });
 
     socket.on('disconnect', function(){
-        var disconnected = users.get(socket).username;
-        console.log('user disconnected' + disconnected);
         users.delete(socket);
-        var index = userlist.indexOf(disconnected);
-        if (index > -1) {
-            userlist.splice(index, 1);
-        }
+        userlist.length = 0;
+        users.forEach(function(user, socket){
+            userlist.push(user.username);
+        });
         io.emit('change_userlist', userlist);
     });
 });

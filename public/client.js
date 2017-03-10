@@ -53,14 +53,17 @@ $(function() {
         var usercolor = msg.color;
 
         if (msg.style === "bold") {
-            $('#messages').append('<li><b>' + current_time + 
+            message = '<li><b>' + current_time + 
                     '</b> <username class="userColor" style="color:'+usercolor+';">' +
-                    username + '</username>: <b>'+ msg.message + '</b>');
+                    username + '</username>: <b>'+ msg.message + '</b>';
+            $('#messages').append(message);
         } else {
-            $('#messages').append('<li><b>' + current_time + 
+            message = '<li><b>' + current_time + 
                     '</b> <username class="userColor" style="color:'+usercolor+';">' +
-                    username + '</username>: '+ msg.message);
+                    username + '</username>: '+ msg.message;
+            $('#messages').append(message);
         }
+        socket.emit('store-message', message);
     });
 });
 
