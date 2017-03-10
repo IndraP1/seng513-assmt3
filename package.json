@@ -4,9 +4,7 @@
   "description": "my first socket.io app",
   "dependencies": {
     "express": "^4.14.1",
-    "socket.io": "^1.7.3",
-    "cookies": "~0.7.0",
-    "cookie-parser": "~1.4.3"
+    "socket.io": "^1.7.3"
   },
   "scripts": {
     "start": "node index.js"

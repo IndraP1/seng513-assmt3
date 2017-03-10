@@ -4,14 +4,9 @@ var http = require('http').createServer(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
 
-var cookie = require('cookies');
-var cookieParser = require('cookie-parser');
-
 var users = new Map();
 var userlist = [];
 var messages = [];
-
-app.use(cookieParser());
 
 http.listen( port, function () {
     console.log('listening on port', port);
