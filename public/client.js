@@ -1,22 +1,21 @@
 // shorthand for $(document).ready(...)
 $(function() {
     var socket = io();
-    var users = [];
-    var username;
     var usercolor;
+    var username = getCookie("username");
 
-    // var username = getCookie("username");
-    if (username === undefined) {
+    if (username === undefined || username === "" || username === null) {
         username = "user" + Math.random();
         setCookie("username", username); 
         usercolor = "blue";
         setCookie("usercolor", usercolor);
 
         socket.emit('add-user', username, usercolor);
-    }
+    } else {
+        username = getCookie("username");
+        usercolor = getCookie("usercolor");
 
-    if ($.inArray(username, users) === -1) {
-        users.push(username); 
+        socket.emit('add-user', username, usercolor);
     }
 
     $('div.username-display').html('You are user: ' + getCookie("username"));
@@ -31,9 +30,12 @@ $(function() {
     });
 
     socket.on('change_userlist', function(users) {
+        $('#user-display').empty();
         console.log("change userlist");
-        $('#user-display').append('<li>'+users);
         console.log(users);
+        for (var i in users) {
+            $('#user-display').append('<li>'+users[i]);
+        }
     });
 
     $('form').submit(function() {
@@ -59,11 +61,6 @@ $(function() {
                     '</b> <username class="userColor" style="color:'+usercolor+';">' +
                     username + '</username>: '+ msg.message);
         }
-    });
-
-    //WIP
-    socket.on('disconnect', function() {
-        socket.emit('disconnected', username);
     });
 });
 

@@ -18,7 +18,6 @@ http.listen( port, function () {
 
 // listen to 'chat' messages
 io.on('connection', function(socket){
-
     socket.on('add-user', function(username, usercolor){
         console.log('user connected' + username);
         users.set(socket, {username: username, usercolor: usercolor}); 
@@ -58,8 +57,15 @@ io.on('connection', function(socket){
         socket.broadcast.emit('chat', {message: msg.message, date: current_date, name: msg.name, color: msg.color});
     });
 
-    socket.on('disconnected', function(username){
-        console.log('user disconnected' + username);
+    socket.on('disconnect', function(){
+        var disconnected = users.get(socket).username;
+        console.log('user disconnected' + disconnected);
+        users.delete(socket);
+        var index = userlist.indexOf(disconnected);
+        if (index > -1) {
+            userlist.splice(index, 1);
+        }
+        io.emit('change_userlist', userlist);
     });
 });
 
