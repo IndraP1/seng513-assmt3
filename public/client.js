@@ -3,18 +3,23 @@ $(function() {
     var socket = io();
     var users = [];
     var username;
-    $('div.username-display').html('You are user: ' + getCookie("username"));
+    var usercolor;
 
-    $('form').submit(function() {
-        socket.emit('chat', {message: $('#m').val(), name: getCookie("username"), color: getCookie("usercolor")});
-        $('#m').val('');
-        return false;
-    });
+    // var username = getCookie("username");
+    if (username === undefined) {
+        username = "user" + Math.random();
+        setCookie("username", username); 
+        usercolor = "blue";
+        setCookie("usercolor", usercolor);
 
-    var username = getCookie("username");
+        socket.emit('add-user', username, usercolor);
+    }
+
     if ($.inArray(username, users) === -1) {
         users.push(username); 
     }
+
+    $('div.username-display').html('You are user: ' + getCookie("username"));
 
     socket.on('change_username_cookie', function(msg) {
         setCookie("username", msg);
@@ -29,6 +34,12 @@ $(function() {
         console.log("change userlist");
         $('#user-display').append('<li>'+users);
         console.log(users);
+    });
+
+    $('form').submit(function() {
+        socket.emit('chat', {message: $('#m').val(), name: getCookie("username"), color: getCookie("usercolor")});
+        $('#m').val('');
+        return false;
     });
 
     socket.on('chat', function(msg) {
