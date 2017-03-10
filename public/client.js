@@ -29,10 +29,15 @@ $(function() {
         setCookie("usercolor", msg);
     });
 
+    socket.on('load-history', function(messages) {
+        console.log(messages);
+        for (var i in messages) {
+            $('#messages').append(messages[i]);
+        }
+    });
+
     socket.on('change_userlist', function(users) {
         $('#user-display').empty();
-        console.log("change userlist");
-        console.log(users);
         for (var i in users) {
             $('#user-display').append('<li>'+users[i]);
         }
@@ -63,7 +68,6 @@ $(function() {
                     username + '</username>: '+ msg.message;
             $('#messages').append(message);
         }
-        socket.emit('store-message', message);
     });
 });
 
