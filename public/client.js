@@ -3,6 +3,7 @@ $(function() {
     var socket = io();
     var users = [];
     var username;
+    // $("username-display").update("You are user: " + getCookie("username"));
 
     $('form').submit(function() {
         socket.emit('chat', {message: $('#m').val(), name: getCookie("username"), color: getCookie("usercolor")});
@@ -17,6 +18,13 @@ $(function() {
 
     socket.on('change_username_cookie', function(msg) {
         setCookie("username", msg);
+        $('div.username-display').html('You are user: ' + msg);
+
+        // fieldNameElement.innerHTML = "My new text!";
+
+        // $('username-display').text("You are user: " + msg);
+        // var text = document.getElementById("username-display").textContent;
+        // document.getElementById("username-display").textContent = "This is some text";
     });
 
     socket.on('change_usercolor_cookie', function(msg) {
@@ -47,6 +55,7 @@ $(function() {
         }
     });
 
+    //WIP
     socket.on('disconnect', function() {
         socket.emit('disconnected', username);
     });
